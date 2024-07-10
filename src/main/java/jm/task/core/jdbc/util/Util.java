@@ -9,7 +9,6 @@ import java.sql.SQLException;
 
 public class Util {
     // реализуйте настройку соеденения с БД
-    UserServiceImpl userService = new UserServiceImpl();
 //    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String DB_URI = "jdbc:mysql://localhost:3306/users";
     private static final String DB_USERNAME = "root";

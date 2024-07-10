@@ -12,8 +12,6 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) {
         // реализуйте алгоритм здесь
-/*        Util util = new Util();
-        util.getConnection();*/
         try {
             Util.getConnection();
             UserDao userDao = new UserDaoJDBCImpl();
