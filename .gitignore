@@ -1,0 +1,21 @@
+/build/
+/target/
+
+/.idea/
+*.iml
+
+*.log
+*.swp
+*.DS_Store
+
+/node_modules/
+*.jar
+*.war
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
