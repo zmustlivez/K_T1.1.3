@@ -17,7 +17,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 + "id BIGINT NOT NULL AUTO_INCREMENT,"
                 + "username VARCHAR(255) NOT NULL,"
                 + "lastname VARCHAR(255) NOT NULL,"
-                + "age INT(3) NOT NULL,"
+                + "age TINYINT(3) NOT NULL,"
                 + "PRIMARY KEY (id)"
                 + ")";
         try (Connection connection = Util.getConnection();
