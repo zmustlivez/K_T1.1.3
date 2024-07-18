@@ -20,7 +20,7 @@ public class User {
 
     @OrderColumn
     private Byte age;
-
+@Transient
     public final int x = 9;
 
     public User() {
