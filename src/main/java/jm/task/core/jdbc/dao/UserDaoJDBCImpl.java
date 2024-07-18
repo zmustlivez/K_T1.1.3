@@ -6,28 +6,15 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 
 public class UserDaoJDBCImpl implements UserDao {
+    private static final Logger logger = LogManager.getLogger(UserDaoJDBCImpl.class);
+
     public UserDaoJDBCImpl() {
 
-    }
-
-    @Override
-    public void createUsersTable() {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS users ("
-                + "id BIGINT NOT NULL AUTO_INCREMENT,"
-                + "username VARCHAR(255) NOT NULL,"
-                + "lastname VARCHAR(255) NOT NULL,"
-                + "age TINYINT(3) NOT NULL,"
-                + "PRIMARY KEY (id)"
-                + ")";
-        try (Connection connection = Util.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(createTableSQL);
-//            System.out.println("Table 'Users' created successfully.");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -35,15 +22,46 @@ public class UserDaoJDBCImpl implements UserDao {
         try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("DROP TABLE IF EXISTS users ");
+            logger.info("Table 'users' dropped successfully.");
 //            System.out.println("Table 'Users' delete successfully.");
+            // Проверка наличия таблицы после удаления
+            boolean tableExists = checkIfTableExists(connection, "users");
+            if (!tableExists) {
+                logger.info("Table 'users' doesn't exist in the database.");
+            } else {
+                logger.warn("Table 'users' still exists in the database after deletion!");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
+    public void createUsersTable() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS users ("
+                + "id BIGINT NOT NULL AUTO_INCREMENT,"
+                + "name VARCHAR(255) NOT NULL,"
+                + "lastname VARCHAR(255) NOT NULL,"
+                + "age TINYINT(3) NOT NULL,"
+                + "PRIMARY KEY (id)"
+                + ")";
+        try (Connection connection = Util.getConnection();
+             PreparedStatement statement = connection.prepareStatement(createTableSQL)) {
+            statement.execute();//Update();
+            logger.info("Table 'users' create successfully.");
+//            System.out.println("Table 'Users' created successfully.");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private boolean checkIfTableExists(Connection connection, String tableName) throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
+        ResultSet tables = metaData.getTables(null, null, tableName, null);
+        return tables.next();
+    }
+    @Override
     public void saveUser(String name, String lastName, byte age) {
-        String insertSQL = "INSERT INTO users (username, lastname, age) VALUES (?, ?, ?)";
+        String insertSQL = "INSERT INTO users (name, lastname, age) VALUES (?, ?, ?)";
         try (Connection connection = Util.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             preparedStatement.setString(1, name);
@@ -72,12 +90,14 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> users = new ArrayList<>();
         String requireSQL = "SELECT * FROM users";
         try (Connection connection = Util.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(requireSQL)) {
+//             Statement statement = connection.createStatement();
+             PreparedStatement statement = connection.prepareStatement(requireSQL)) {
+            ResultSet resultSet = statement.executeQuery();
+
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
-                user.setName(resultSet.getString("username"));
+                user.setName(resultSet.getString("name"));
                 user.setLastName(resultSet.getString("lastname"));
                 user.setAge(resultSet.getByte("age"));
                 users.add(user);
@@ -100,4 +120,6 @@ public class UserDaoJDBCImpl implements UserDao {
             throw new RuntimeException(e);
         }
     }
+
+
 }

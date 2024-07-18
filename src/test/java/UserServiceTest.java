@@ -1,13 +1,20 @@
+import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
+import jm.task.core.jdbc.util.Util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class UserServiceTest {
     private final UserService userService = new UserServiceImpl();
+//    private final UserDaoHibernateImpl userService = new UserDaoHibernateImpl();
 
     private final String testName = "Ivan";
     private final String testLastName = "Ivanov";
@@ -99,4 +106,22 @@ public class UserServiceTest {
         }
     }
 
+    @Test
+    public void getSupportedProceduresDB() {
+        try (Connection connection = Util.getConnection()) {
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+            boolean haveSupportedProceduresDV = databaseMetaData.supportsStoredProcedures();
+            if (haveSupportedProceduresDV) {
+                ResultSet procedures = databaseMetaData.getProcedures(null, null, "%");
+                while (procedures.next()){
+                    System.out.println(procedures.getString("PROCEDURE_CAT"));
+//                    System.out.println(procedures.getString("PROCEDURE_SCHEME"));
+                    System.out.println(procedures.getString("PROCEDURE_NAME"));
+                    System.out.println(procedures.getString("PROCEDURE_TYPE"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

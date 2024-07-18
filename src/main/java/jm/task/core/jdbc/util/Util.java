@@ -14,9 +14,10 @@ import java.util.Properties;
 
 public class Util {
     // реализуйте настройку соеденения с БД
-    private static final String DB_URI = "jdbc:mysql://localhost:3306/users";
+    private static final String DB_URI = "jdbc:mysql://localhost:3306/users?useSSL=false";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "123";
+
     public static Connection getConnection() throws SQLException {
 
         Connection connection = null;
@@ -30,6 +31,7 @@ public class Util {
     }
 
     private static SessionFactory sessionFactory;
+
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             try {
@@ -37,7 +39,7 @@ public class Util {
 
                 // Hibernate settings equivalent to hibernate.cfg.xml's properties
                 Properties settings = new Properties();
-                settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
+//                settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
                 settings.put(Environment.URL, "jdbc:mysql://localhost:3306/users?useSSL=false");
                 settings.put(Environment.USER, "root");
                 settings.put(Environment.PASS, "123");
@@ -47,7 +49,7 @@ public class Util {
 
                 settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 
-                settings.put(Environment.HBM2DDL_AUTO, "create-drop");
+                settings.put(Environment.HBM2DDL_AUTO, "create-drop");//"validate");//create-
 
                 configuration.setProperties(settings);
 
@@ -58,7 +60,9 @@ public class Util {
 
                 sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Initial SessionFactory creation failed." + e);
+                throw new ExceptionInInitializerError(e);
+//                e.printStackTrace();
             }
         }
         return sessionFactory;

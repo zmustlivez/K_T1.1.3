@@ -17,8 +17,11 @@ public class User {
     @OrderColumn
     private String lastName;
 
+
     @OrderColumn
     private Byte age;
+
+    public final int x = 9;
 
     public User() {
 
